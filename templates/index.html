@@ -1,0 +1,124 @@
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Add a delegate to Gnosis multisig</title>
+  </head>
+  <form>
+    <div class="form-group">
+      <h3>Sign data using meta Mask to add delegate to Gnosis multisig</h3>
+      <div class="form-group">
+        <input
+          class="form-control"
+          type="text"
+          id="multisigSafe"
+          name="multisigSafe"
+          placeholder="Enter multisigSafe Address"
+          size="100"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          class="form-control"
+          type="text"
+          id="delegate"
+          name="delegate"
+          placeholder="Enter delegate Address"
+          size="100"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          class="form-control"
+          type="text"
+          id="delegateHash"
+          name="delegateHash"
+          placeholder="Enter delegate hash for Signing"
+          size="100"
+        />
+      </div>
+    </div>
+    <div class="container">
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        id="addDelegateBtn"
+        onclick="submitData(form)"
+      >
+        Add delegate
+      </button>
+    </div>
+  </form>
+
+  <script type="text/javascript">
+    async function submitData(form) {
+      // Set URL for mainnet
+      const delegatesUrl =
+        "https://safe-transaction.gnosis.io/api/v1/delegates/";
+
+      // Set URL for goerli testnet
+      // const delegatesUrl = "https://safe-transaction.goerli.gnosis.io/api/v1/delegates/";
+
+      const multisigSafe = document.getElementById("multisigSafe").value;
+      const delegate = document.getElementById("delegate").value;
+      const delegateHash = document.getElementById("delegateHash").value;
+
+      console.log("delegate ", delegate);
+      accounts = await ethereum.request({ method: "eth_requestAccounts" });
+      const web3 = new Web3(window.ethereum);
+      const totp = (Date.now() / 1000 / 3600).toFixed(0);
+      console.log("totp " + totp);
+      console.log("delegate+totp", delegate + totp);
+
+      const from = web3.utils.toChecksumAddress(accounts[0]);
+      console.log("From", from);
+      console.log("delegateHash", delegateHash);
+      const params = [delegateHash, from];
+      const method = "personal_sign";
+
+      web3.currentProvider.sendAsync(
+        {
+          method,
+          params,
+          from,
+        },
+        async function (err, result) {
+          if (err) return console.dir(err);
+          if (result.error) {
+            alert(result.error.message);
+          }
+          if (result.error) return console.error("ERROR", result);
+          const signedData = result.result;
+
+          console.log(delegatesUrl);
+          const data = {
+            safe: web3.utils.toChecksumAddress(multisigSafe),
+            delegate: delegate,
+            delegator: from,
+            // refer https://github.com/gnosis/safe-contracts/blob/main/src/utils/execution.ts#L97
+            signature: signedData.replace(/1b$/, "1f").replace(/1c$/, "20"),
+            label: "Vesper delegator",
+          };
+          console.log({ data });
+
+          // send request to add delegator
+          const response = await fetch(delegatesUrl, {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+          response.json().then((data) => {
+            console.log(data);
+            alert('Delegate added: ', data)
+          });
+        }
+      );
+    }
+  </script>
+</html>
