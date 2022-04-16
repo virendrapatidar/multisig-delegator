@@ -1,19 +1,19 @@
-## pip install requests
-## pip install eth_account
+## Add gnosis delegator using python using gnosis safe private key.
+## pip3 install requests
+## pip3 install eth_account
 ## python3 delegate.py 
 
 import requests
-import eth_account
 import time
 from eth_account import Account
 from eth_utils import keccak
 
 
+## Change values as needed.
 SAFE_ADDRESS = '0xB6F812c919c514f961118b968DcEEC6E2873Bf9d'
-OWNER_PRIVATE_KEY = '......'
-DELEGATE_ADDRESS = '0x23878197A56BFD9088b196f4b3CeE8D21B621f08'
-TX_SERVICE_BASE_URL = 'https://safe-transaction.goerli.gnosis.io'
-
+OWNER_PRIVATE_KEY = '....'
+DELEGATE_ADDRESS = '0x5D184b425E08F5AD13a5a22f9d9bA90221428FE1'
+TX_SERVICE_BASE_URL = 'https://safe-transaction.goerli.gnosis.io' #Goerli testnet
 
 
 ### Add delegate
@@ -26,7 +26,7 @@ add_payload = {
     "safe": SAFE_ADDRESS,
     "delegate": DELEGATE_ADDRESS,
     "signature": signature.signature.hex(),
-    "label": "My new delegate2"
+    "label": "Vesper delegate python"
 }
 
 add_response = requests.post(f'{TX_SERVICE_BASE_URL}/api/v1/safes/{SAFE_ADDRESS}/delegates/', json=add_payload, headers = {'Content-type': 'application/json'})
