@@ -10,10 +10,10 @@ from eth_utils import keccak
 
 
 ## Change values as needed.
-SAFE_ADDRESS = '0xB6F812c919c514f961118b968DcEEC6E2873Bf9d'
-OWNER_PRIVATE_KEY = '....'
-DELEGATE_ADDRESS = '0x5D184b425E08F5AD13a5a22f9d9bA90221428FE1'
-TX_SERVICE_BASE_URL = 'https://safe-transaction.goerli.gnosis.io' #Goerli testnet
+SAFE_ADDRESS = '0x4e3C45d6ADe7c524396D16A61921036ce25ffD50'
+OWNER_PRIVATE_KEY = '...'
+DELEGATE_ADDRESS = '0xdf826ff6518e609E4cEE86299d40611C148099d5'
+TX_SERVICE_BASE_URL = 'https://safe-transaction.gnosis.io'
 
 
 ### Add delegate
@@ -34,7 +34,7 @@ add_response = requests.post(f'{TX_SERVICE_BASE_URL}/api/v1/safes/{SAFE_ADDRESS}
 print(add_response.text)
 print(add_response.status_code)
 
-### Remove delegate
+## Remove delegate
 # totp = int(time.time()) // 3600
 # hash_to_sign = keccak(text=DELEGATE_ADDRESS + str(totp))
 # account = Account.from_key(OWNER_PRIVATE_KEY)
